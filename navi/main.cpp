@@ -1,186 +1,22 @@
-#include "windows.h"
-#include <iostream>
 #include "queue.h"
-#include<cmath>
-#include<cstdlib>
+#include "stack.h"
+#include <cppgpio.hpp>
+#include <iostream>
+#include <cmath>
 
-int start = 110; 
-int target = 502;
+#define START 110
+#define TARGET 502
 
 using namespace std;
-/*
-    Define main Priority Queue Node Structure.
-    ---- 
- */
-struct Queue_Node {
-    int loc;
-    int parent;
-    int ob;
-    int g;
-    int h;
-    int f;
-    struct Queue_Node* next;
+using namespace PStack;
+using namespace PQueue;
+
+
+struct movein {
+    int motion;
+    int new_head;
 };
 
-
-/*
-    Define Priority Queue class
-    ---
-        Public funcs:
-            - enqueue:
-
-                Return Type: void
-                Parameters: Queue_Node
-                Info:
-                    Insert node(Queue_Node type) into Priority Queue.
-                    And then, sorting all elements.
-
-            - dequeue:
-                Return Type: Queue_Node
-                Parameters: void
-                Info:
-                    Return node(Queue_Node type)
-
-        Private funcs:
-            - sorting:
-                Return Type: void
-                Parameters: void
-*/
-class P_Queue {
-public:
-    Queue_Node* qNode;
-    P_Queue() {
-        qNode = NULL;
-    }
-
-    void enqueue(Queue_Node* node) {
-        // cout << node->f << endl;
-
-        Queue_Node* t, * q;
-        t = new Queue_Node;
-
-        if (qNode == NULL || node->f < qNode->f) {
-            t->next = qNode;
-            apply(node, t);
-            qNode = t;
-        }
-        else {
-            q = qNode;
-            while (q->next != NULL && q->next->f <= node->f) {
-                q = q->next;
-            }
-            t->next = q->next;
-            q->next = t;
-            apply(node, t);
-        }
-    }
-
-    Queue_Node* dequeue(void) {
-        Queue_Node* t;
-        t = new Queue_Node;
-        if (qNode == NULL) {
-            return t;
-        }
-        else {
-            t = qNode;
-            qNode = qNode->next;
-            return t;
-        }
-    }
-
-    bool find(int num) {
-        Queue_Node* t;
-        t = qNode;
-        while (t->next != NULL && t->loc != num) {
-            t = t->next;
-        }
-        if (t->loc == num) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
-
-    Queue_Node* findptr(int num) {
-        Queue_Node* t;
-        t = qNode;
-        while (t->next != NULL && t->loc != num) {
-            t = t->next;
-        }
-        if (t->loc == num) {
-            return t;
-        }
-        else {
-            t = NULL;
-            return t;
-        }
-    }
-
-private:
-    void apply(Queue_Node* input_node, Queue_Node* target_node) {
-        target_node->f = input_node->f;
-        target_node->g = input_node->g;
-        target_node->h = input_node->h;
-        target_node->loc = input_node->loc;
-        target_node->parent = input_node->parent;
-        target_node->ob = input_node->ob;
-    }
-};
-
-struct Stack_Node {
-    int loc;
-    int parent;
-    struct Stack_Node* next;
-};
-class P_Stack {
-public:
-    Stack_Node* top;
-    P_Stack() {
-        top = NULL;
-    }
-
-    void push(Stack_Node* s_node){
-        // cout << s_node->loc << endl;
-
-        Stack_Node* t, * q;
-        t = new Stack_Node;
-        q = new Stack_Node;
-
-        if (top == NULL) {
-            t->next = NULL;
-            apply(s_node, t);
-            top = t;
-        }
-        else{
-            q->next = top;
-            apply(s_node, q);
-            top = q;
-        }
-    }
-
-    Stack_Node* pop() {
-        Stack_Node* t;
-        t = new Stack_Node;
-
-        if (top == NULL) {
-            cout << "top is NULL" << endl;
-            return top;
-        }
-        else {
-            t = top;
-            top = top->next;
-            return t;
-            free(t);
-        }
-    }
-
-private:
-    void apply(Stack_Node* input_node, Stack_Node* target_node) {
-        target_node->loc = input_node->loc;
-        target_node->parent = input_node->parent;
-        }
-};
 
 void show(P_Queue* queue) {
     Queue_Node* ptr;
@@ -197,6 +33,7 @@ void show(P_Queue* queue) {
         cout << "\n";
     }
 }
+
 
 int find_loc(int head, int s, int current) {
     int i = (head * 3 + s) % 4;
@@ -219,6 +56,7 @@ int find_loc(int head, int s, int current) {
     return ask;
 }
 
+
 int cal_ob(int s, int sensor) {
     int obs;
     switch (s)
@@ -238,10 +76,6 @@ int cal_ob(int s, int sensor) {
     return obs;
 }
 
-struct movein {
-    int motion;
-    int new_head;
-};
 
 movein move_c(int head, int current, int expect) {
     int a = expect / 100 - current / 100;
@@ -307,21 +141,23 @@ movein move_c(int head, int current, int expect) {
     return result;
 }
 
+
 int main(void) {
-    
+
     P_Queue closedlist;
     P_Queue openlist;
-    Queue_Node node;
     P_Stack route;
     Stack_Node s_node;
-    node.loc = start;
+
+    Queue_Node node;
+    node.loc = START;
     node.parent = 0;
     node.ob = 0;
     node.g = 0;
     node.h = 0;
     node.f = 10000;
 
-    s_node.loc = start;
+    s_node.loc = START;
     s_node.parent = 0;
 
     int g = 0;
@@ -333,12 +169,12 @@ int main(void) {
 
     //show(&closedlist);
     int head = 0;
-    int current = start;
+    int current = START;
     
-    while (current != target) {
+    while (current != TARGET) {
         int sensor;
         cout << current << endl;
-        cout << "�������� �Է� (�� �� ��)";
+        cout << "Enter sensor values (L, F, R):";
         cin >> sensor;
 
         for (int s = 0; s < 3; s++) {
@@ -354,12 +190,12 @@ int main(void) {
                 n.parent = current;
                 n.ob = cal_ob(s, sensor); 
                 n.g = g;
-                float num_1 = pow(target / 100 - n.loc / 100, 2);
-                float num_2 = pow(target % 100 - n.loc % 100, 2);
+                float num_1 = pow(TARGET / 100 - n.loc / 100, 2);
+                float num_2 = pow(TARGET % 100 - n.loc % 100, 2);
                 float num_t = sqrt(num_1+num_2);
                 n.h = num_t;
                 n.f = n.g + n.h + n.ob;
-                if (n.loc == target) {
+                if (n.loc == TARGET) {
                     n.f = 0;
                 }
 
@@ -401,7 +237,7 @@ int main(void) {
                 cout << "expect -> loc" <<expect->loc << endl;
 
 
-                if (expect->loc == target) {
+                if (expect->loc == TARGET) {
                     cout << "if"  << endl;
                     break;
                 }
