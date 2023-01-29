@@ -15,6 +15,7 @@ LIBRARIES = -lwiringPi -lpthread
 all: $(TARGET)
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
+	mkdir $(OBJ_DIR) 2> /dev/null || true
 	$(CC) -c $< -o $@ -MD 
 
 $(TARGET) : $(OBJECTS)
