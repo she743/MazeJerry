@@ -6,6 +6,7 @@
 using namespace std;
 using namespace MotorCTL;
 
+int speed = 20;
 
 Motor::Motor( int r_fpin, int r_bpin, int l_fpin, int l_bpin ) {
     wiringPiSetup();
@@ -30,43 +31,41 @@ void Motor::cleanup( void ) {
 }
 
 
-void Motor::move( Instruct instruction ) {
-    if (instruction.dir) {
-        // FORWARD or BACKWARD
-        if (instruction.speed > 0) this->forward( instruction.speed );
-        else this->backward();
-    }
-    else {
-        // LEFT or RIGHT
-        if (instruction.speed > 0) this->turn_left();
-        else this->turn_right();
-    }
-    delay(5000);
-}
 
-
-void Motor::forward( int speed ) {
-    cout << "FORWARD (" << speed << ")" << endl;
+void Motor::forward( void ) {
+    cout << "FORWARD " << endl;
     softPwmWrite(this->r_forward_pin, 0);
     softPwmWrite(this->r_backward_pin, speed);
-    softPwmWrite(this->l_forward_pin, 0);
-    softPwmWrite(this->l_backward_pin, speed);
+    softPwmWrite(this->l_forward_pin, speed);
+    softPwmWrite(this->l_backward_pin, 0);
 }
 
 
-void Motor::backward( void ) {
-    
+void Motor::stop( void ) {
+    // TURN 180 degrees
+    cout << "STOP " << endl;
+    softPwmWrite(this->r_forward_pin, 0);
+    softPwmWrite(this->r_backward_pin, 0);
+    softPwmWrite(this->l_forward_pin, 0);
+    softPwmWrite(this->l_backward_pin, 0);
 }
 
 
 void Motor::turn_left( void ) {
-    
+    // MOVE LEFT
+    cout << "LEFT" << endl;
+    softPwmWrite(this->r_forward_pin, 0);
+    softPwmWrite(this->r_backward_pin, speed);
+    softPwmWrite(this->l_forward_pin, 0);
+    softPwmWrite(this->l_backward_pin, speed);  
 }
 
 
 void Motor::turn_right( void ) {
-    
+    // MOVE RIGHT
+    cout << "RIGHT" << endl;
+    softPwmWrite(this->r_forward_pin, speed);
+    softPwmWrite(this->r_backward_pin, 0);
+    softPwmWrite(this->l_forward_pin, speed);
+    softPwmWrite(this->l_backward_pin, 0);  
 }
-
-
-
