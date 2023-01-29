@@ -1,1 +1,0 @@
-g++ -o out/jerry navi/main.cpp navi/aStar.cpp navi/stack.cpp navi/stack.h navi/queue.h navi/queue.cpp
