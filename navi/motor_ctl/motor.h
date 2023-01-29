@@ -15,7 +15,6 @@ namespace MotorCTL{
             int l_forward_pin;
             int l_backward_pin;
 
-
             void forward( int speed );
             void backward( void );
             void turn_right( void );
