@@ -14,7 +14,6 @@ main: lib $(OBJECTS)
 
 lib:
 	g++ -c $(FILE).$(CPP)
-	mv $(FILE).$(OBJ) $(OBJECT_DIR)/
 
 clean:
 	rm a.out
