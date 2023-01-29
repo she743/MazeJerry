@@ -11,9 +11,20 @@
 #define START 110
 #define TARGET 502
 
+// !!change pin number!!
+// IR sensor for detecting wall
 int irpin_l = 21;
 int irpin_f = 22;
 int irpin_r = 24;
+
+// TCRT sensor for detecting line
+int left_tcrt_pin = 0;
+int middle_tcrt_pin = 1;
+int right_tcrt_pin = 2;
+
+// Motor pin
+Motor motors (1, 26, 23, 24);
+
 
 int ir_sensor_data = 0;
 
@@ -153,15 +164,12 @@ movein move_c(int head, int current, int expect) {
     return result;
 }
 
-int left_tcrt_pin = 0;
-int middle_tcrt_pin = 1;
-int right_tcrt_pin = 2;
 
 
 Sensor tcrt(left_tcrt_pin, middle_tcrt_pin, right_tcrt_pin);
 SensorDataFrame tcrt_data;
 int tcrt_data_int =0;
-Motor motors (1, 26, 23, 24);
+
 
 void motion_forward( void ){
     tcrt_data = tcrt.get();
