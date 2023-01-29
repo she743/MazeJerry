@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cmath>
 
+#include "sensor/sensing.h"
+
 #define START 110
 #define TARGET 502
 
@@ -220,7 +222,6 @@ int main(void) {
                 }
             }
         }
-        //list�� node �߰�
         
         Queue_Node* expect = openlist.dequeue();
         closedlist.enqueue(expect);
