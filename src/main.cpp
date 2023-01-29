@@ -3,16 +3,26 @@
 #include <cppgpio.hpp>
 #include <iostream>
 #include <cmath>
-
+#include "wiringPi.h"
 #include "sensing.h"
+#include "motor.h"
+
 
 #define START 110
 #define TARGET 502
+
+int irpin_l = 21;
+int irpin_f = 22;
+int irpin_r = 24;
+
+int ir_sensor_data = 0;
 
 using namespace std;
 using namespace PStack;
 using namespace PQueue;
 
+using namespace Sensing;
+using namespace MotorCTL;
 
 struct movein {
     int motion;
@@ -143,6 +153,130 @@ movein move_c(int head, int current, int expect) {
     return result;
 }
 
+int left_tcrt_pin = 0;
+int middle_tcrt_pin = 1;
+int right_tcrt_pin = 2;
+
+
+Sensor tcrt(left_tcrt_pin, middle_tcrt_pin, right_tcrt_pin);
+SensorDataFrame tcrt_data;
+int tcrt_data_int =0;
+Motor motors (1, 26, 23, 24);
+
+void motion_forward( void ){
+    tcrt_data = tcrt.get();
+    tcrt_data_int = tcrt_data.data;
+    while(tcrt_data_int != 010 || tcrt_data_int != 000){
+        motors.forward();
+        tcrt_data = tcrt.get();
+        tcrt_data_int = tcrt_data.data;
+        }
+
+    while(tcrt_data_int != 101 || tcrt_data_int != 111){
+        motors.forward();
+        tcrt_data = tcrt.get();
+        tcrt_data_int = tcrt_data.data;
+        if(tcrt_data_int == 110 || tcrt_data_int == 100){
+            motors.calibL();
+        }
+        else if(tcrt_data_int == 011 || tcrt_data_int == 001){
+            motors.calibR();
+        }
+        }
+    motors.stop();
+    tcrt.cleanup();
+    }
+    /*
+        while sensor data is not 010 or 000
+            do:
+                forward
+                sensor data = sensor.get()
+
+        forward() // to get away from the black line
+        delay(100);
+
+        while sensor data is not 101 or 111
+            do: 
+                forward
+                sensor data = sensor.get()
+        
+        stop();
+    */ 
+
+void motion_turn_right( void ){
+    tcrt_data = tcrt.get();
+    tcrt_data_int = tcrt_data.data;
+    while(tcrt_data_int != 010 || tcrt_data_int != 000){
+        motors.turn_right();
+        tcrt_data = tcrt.get();
+        tcrt_data_int = tcrt_data.data;
+        }
+
+    motors.turn_right();
+    delay(100);
+
+    while(tcrt_data_int != 101 || tcrt_data_int != 111){
+        motors.turn_right();
+        tcrt_data = tcrt.get();
+        tcrt_data_int = tcrt_data.data;
+        }
+    motors.stop();
+    tcrt.cleanup();
+    }
+
+void motion_turn_left( void ){
+    tcrt_data = tcrt.get();
+    tcrt_data_int = tcrt_data.data;
+    while(tcrt_data_int != 010 || tcrt_data_int != 000){
+        motors.turn_left();
+        tcrt_data = tcrt.get();
+        tcrt_data_int = tcrt_data.data;
+        }
+
+    motors.turn_left();
+    delay(100);
+
+    while(tcrt_data_int != 101 || tcrt_data_int != 111){
+        motors.turn_left();
+        tcrt_data = tcrt.get();
+        tcrt_data_int = tcrt_data.data;
+        }
+    motors.stop();
+    tcrt.cleanup();
+    }
+
+
+void motion(int move_info){
+    switch(move_info){
+        case 0:
+            // forward
+            motion_forward();
+            break;
+        case 1:
+            // left + forward
+            motion_turn_left();
+            motion_forward();
+            break;
+        case 2:
+            // right + right + forward
+            motion_turn_right();
+            motion_turn_right();
+            motion_forward();
+            break;
+        case 3:
+            // right + forward
+            motion_turn_right();
+            motion_forward();
+            break;
+        default:
+            //forward?
+            motion_forward();
+            break;
+    }
+}
+
+
+
 
 int main(void) {
 
@@ -174,23 +308,30 @@ int main(void) {
     int current = START;
     
     while (current != TARGET) {
-        int sensor;
+        /*
         cout << current << endl;
         cout << "Enter sensor values (L, F, R):";
         cin >> sensor;
+        */
+
+        Sensor sensors(irpin_l,irpin_f,irpin_r);
+        SensorDataFrame irdata = sensors.get();
+        ir_sensor_data = irdata.l_data*100 + irdata.f_data*10 + irdata.r_data;
+        sensors.cleanup();
+
 
         for (int s = 0; s < 3; s++) {
             int num = find_loc(head, s, current);
             if (!closedlist.find(num)) {
-                if (cal_ob(s, sensor) == 0) {
-                    int cc = cal_ob(s, sensor);
+                if (cal_ob(s, ir_sensor_data) == 0) {
+                    int cc = cal_ob(s, ir_sensor_data);
                     //cout << cc << endl;
                     num = find_loc(head, s, num);
                 }
                 Queue_Node n;
                 n.loc = num;
                 n.parent = current;
-                n.ob = cal_ob(s, sensor); 
+                n.ob = cal_ob(s, ir_sensor_data); 
                 n.g = g;
                 float num_1 = pow(TARGET / 100 - n.loc / 100, 2);
                 float num_2 = pow(TARGET % 100 - n.loc % 100, 2);
@@ -249,6 +390,7 @@ int main(void) {
                 cout << "head : " << head << endl;
                 cout << "loc : " << back->loc << endl;
                 cout << "parent : " << back->parent << endl;
+                motion(motion_info);
                 //cout << "111111" << endl;
             }
             back = route.pop();
@@ -259,6 +401,7 @@ int main(void) {
             cout << "move : " << motion_info << endl;
             cout << "head : " << head << endl;
             cout << "----back----" << endl;
+            motion(motion_info);
         }
         information = move_c(head, current, expect->loc);
         motion_info = information.motion;
@@ -268,6 +411,7 @@ int main(void) {
         cout << "move : " << motion_info << endl;
         cout << "head : " <<head << endl;
         cout << "----forward----" << endl;
+        motion(motion_info);
         s_node.loc = expect->loc;
         s_node.parent = expect->parent;
         route.push(&s_node);

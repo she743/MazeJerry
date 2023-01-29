@@ -69,3 +69,21 @@ void Motor::turn_right( void ) {
     softPwmWrite(this->l_forward_pin, speed);
     softPwmWrite(this->l_backward_pin, 0);  
 }
+
+void Motor::calibR( void ) {
+    // Calibrate movement
+    cout << "Calibrating to R" << endl;
+    softPwmWrite(this->r_forward_pin, 0);
+    softPwmWrite(this->r_backward_pin, speed-10);
+    softPwmWrite(this->l_forward_pin, speed);
+    softPwmWrite(this->l_backward_pin, 0);  
+}
+
+void Motor::calibL( void ) {
+    // Calibrate movement
+    cout << "Calibrating to L" << endl;
+    softPwmWrite(this->r_forward_pin, 0);
+    softPwmWrite(this->r_backward_pin, speed);
+    softPwmWrite(this->l_forward_pin, speed-10);
+    softPwmWrite(this->l_backward_pin, 0);  
+}

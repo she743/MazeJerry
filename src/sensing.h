@@ -3,6 +3,7 @@ namespace Sensing{
         int l_data;
         int f_data;
         int r_data;
+        int data;
     };
 
     class Sensor{

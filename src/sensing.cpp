@@ -24,12 +24,12 @@ SensorDataFrame Sensor::get() {
     /*
         Read Sensor's values (Use 'digitalRead()' function).
     */
-    SensorDataFrame new_data = { 
-        digitalRead(this->left_pin), 
-        digitalRead(this->forward_pin), 
-        digitalRead(this->right_pin)
-    };
+    int l_data = digitalRead(this->left_pin);
+    int f_data = digitalRead(this->forward_pin);
+    int r_data = digitalRead(this->right_pin);
+    int data = l_data * 100 + f_data * 10 + r_data;
 
+    SensorDataFrame new_data = { l_data, f_data, r_data, data };
     return new_data;
 }
 
