@@ -7,20 +7,23 @@
 #include "sensing.h"
 #include "motor.h"
 
+// !! change start and target location !!
+#define START 216
+#define TARGET 1202
+//x*100+y
 
-#define START 110
-#define TARGET 502
+using namespace MotorCTL;
 
 // !!change pin number!!
 // IR sensor for detecting wall
-int irpin_l = 21;
-int irpin_f = 22;
-int irpin_r = 24;
+int irpin_l = 4;
+int irpin_f = 5;
+int irpin_r = 6;
 
 // TCRT sensor for detecting line
-int left_tcrt_pin = 0;
-int middle_tcrt_pin = 1;
-int right_tcrt_pin = 2;
+int left_tcrt_pin = 2;
+int middle_tcrt_pin = 3;
+int right_tcrt_pin = 0;
 
 // Motor pin
 Motor motors (1, 26, 23, 24);
@@ -33,7 +36,7 @@ using namespace PStack;
 using namespace PQueue;
 
 using namespace Sensing;
-using namespace MotorCTL;
+
 
 struct movein {
     int motion;
@@ -174,20 +177,20 @@ int tcrt_data_int =0;
 void motion_forward( void ){
     tcrt_data = tcrt.get();
     tcrt_data_int = tcrt_data.data;
-    while(tcrt_data_int != 010 || tcrt_data_int != 000){
+    while(tcrt_data_int != 101 || tcrt_data_int != 111){
         motors.forward();
         tcrt_data = tcrt.get();
         tcrt_data_int = tcrt_data.data;
         }
 
-    while(tcrt_data_int != 101 || tcrt_data_int != 111){
+    while(tcrt_data_int != 010 || tcrt_data_int != 000){
         motors.forward();
         tcrt_data = tcrt.get();
         tcrt_data_int = tcrt_data.data;
-        if(tcrt_data_int == 110 || tcrt_data_int == 100){
+        if(tcrt_data_int == 001 || tcrt_data_int == 011){
             motors.calibL();
         }
-        else if(tcrt_data_int == 011 || tcrt_data_int == 001){
+        else if(tcrt_data_int == 100 || tcrt_data_int == 110){
             motors.calibR();
         }
         }
@@ -214,7 +217,7 @@ void motion_forward( void ){
 void motion_turn_right( void ){
     tcrt_data = tcrt.get();
     tcrt_data_int = tcrt_data.data;
-    while(tcrt_data_int != 010 || tcrt_data_int != 000){
+    while(tcrt_data_int != 101 || tcrt_data_int != 111){
         motors.turn_right();
         tcrt_data = tcrt.get();
         tcrt_data_int = tcrt_data.data;
@@ -223,7 +226,7 @@ void motion_turn_right( void ){
     motors.turn_right();
     delay(100);
 
-    while(tcrt_data_int != 101 || tcrt_data_int != 111){
+    while(tcrt_data_int != 010 || tcrt_data_int != 000){
         motors.turn_right();
         tcrt_data = tcrt.get();
         tcrt_data_int = tcrt_data.data;
@@ -235,7 +238,7 @@ void motion_turn_right( void ){
 void motion_turn_left( void ){
     tcrt_data = tcrt.get();
     tcrt_data_int = tcrt_data.data;
-    while(tcrt_data_int != 010 || tcrt_data_int != 000){
+    while(tcrt_data_int != 101 || tcrt_data_int != 111){
         motors.turn_left();
         tcrt_data = tcrt.get();
         tcrt_data_int = tcrt_data.data;
@@ -244,7 +247,7 @@ void motion_turn_left( void ){
     motors.turn_left();
     delay(100);
 
-    while(tcrt_data_int != 101 || tcrt_data_int != 111){
+    while(tcrt_data_int != 010 || tcrt_data_int != 000){
         motors.turn_left();
         tcrt_data = tcrt.get();
         tcrt_data_int = tcrt_data.data;
@@ -312,7 +315,7 @@ int main(void) {
     route.push(&s_node);
 
     //show(&closedlist);
-    int head = 0;
+    int head = 1;
     int current = START;
     
     while (current != TARGET) {
