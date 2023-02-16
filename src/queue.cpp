@@ -72,6 +72,40 @@ Queue_Node* P_Queue::dequeue(void) {
     }
 }
 
+// find the parent node location and return parent node what we want to find
+int P_Queue::find_parent(int num){
+    Queue_Node* ptr;
+    ptr = qNode;
+    while(ptr->next != NULL && ptr->loc !=num){
+        ptr = ptr->next;
+    }
+    if(ptr->loc == num){
+        return ptr->parent;
+    }
+    else{
+        ptr =NULL;
+        return 0;
+    }
+}
+
+Queue_Node* P_Queue::node_delete(int num){
+    Queue_Node* first;
+    Queue_Node* second;
+    first = qNode;
+    while (first->next != NULL && first->loc != num) {
+        second = first;
+        first = first->next;
+    }
+    if (first->loc == num) {
+        second->next = first->next;
+        return first;
+    }
+    else {
+        first = NULL;
+        return first;
+    }
+}
+// find the node that has specific location value and return the node and delete
 
 void P_Queue::apply(Queue_Node* input_node, Queue_Node* target_node) {
     target_node->f = input_node->f;
