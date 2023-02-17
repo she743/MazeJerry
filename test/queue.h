@@ -13,6 +13,7 @@ namespace PQueue {
         public:
             Queue_Node* qNode;
             P_Queue();
+            bool is_empty(void);
             void enqueue(Queue_Node* node);
             bool find(int num);
             Queue_Node* dequeue(void);

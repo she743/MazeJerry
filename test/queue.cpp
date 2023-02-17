@@ -8,6 +8,15 @@ P_Queue::P_Queue() {
     qNode = NULL;
 }
 
+bool P_Queue::is_empty(void){
+    if(qNode = NULL){
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
 void P_Queue::enqueue(Queue_Node* node) {
     Queue_Node* t, * q;
     t = new Queue_Node;
