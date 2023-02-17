@@ -318,6 +318,7 @@ int main(void) {
     P_Queue openlist;
     P_Stack route;
     Stack_Node s_node;
+    P_Queue neighbor;
 
     Queue_Node node;
     node.loc = START;
@@ -341,6 +342,9 @@ int main(void) {
     int head = 1;
     int current = START;
     
+    movein information;
+    int motion_info;
+
     while (current != TARGET) {
         
         int ir_sensor_data;
@@ -363,8 +367,6 @@ int main(void) {
             // find minimum value in open list
             Queue_Node* expect = openlist.dequeue();
             closedlist.enqueue(expect);
-            movein information;
-            int motion_info;
             Stack_Node* back;
             cout << "expect : " << expect->loc << endl;
 
@@ -454,32 +456,49 @@ int main(void) {
                     if (n.loc == TARGET) {
                         n.f = 0;
                     }
+                    neighbor.enqueue(&n);                
+                }
+                Queue_Node* neighbor_node = neighbor.dequeue();
+                closedlist.enqueue(neighbor_node);
+                information = move_c(head, current, neighbor_node->loc);
+                motion_info = information.motion;
+                head = information.new_head;
+                current = neighbor_node->loc;
+                cout <<"current : " << current << endl;
+                cout << "move : " << motion_info << endl;
+                cout << "head : " <<head << endl;
+                cout << "----forward----" << endl;
+                //motion(motion_info, tcrt, motors);
+                s_node.loc = neighbor_node->loc;
+                s_node.parent = neighbor_node->parent;
+                route.push(&s_node);
 
+                g++;
 
-
-
-
-                    // compare 3 node and we have to find where we go
+                // compare 3 node and we have to find where we go
+                while(!neighbor.is_empty()){
+                    neighbor_node = neighbor.dequeue();
+                    num = neighbor_node->loc;
                     if (openlist.find(num)) {
                         Queue_Node* ptr;
                         ptr = openlist.findptr(num);
-                        if (ptr->f > n.f) {
-                            ptr->f = n.f;
-                            ptr->g = n.g;
-                            ptr->h = n.h;
-                            ptr->loc = n.loc;
+                        if (ptr->f > neighbor_node->f) {
+                            ptr->f = neighbor_node->f;
+                            ptr->g = neighbor_node->g;
+                            ptr->h = neighbor_node->h;
+                            ptr->loc = neighbor_node->loc;
                             // ptr->next = n.next;
-                            ptr->ob = n.ob;
-                            ptr->parent = n.parent;
+                            ptr->ob = neighbor_node->ob;
+                            ptr->parent = neighbor_node->parent;
                         }
                     }
                     else {
-                        openlist.enqueue(&n);
-                        cout << "n loc" << n.loc << endl;
-                        cout << "n g" << n.g << endl;
-                        cout << "n h" << n.h << endl;
+                        openlist.enqueue(neighbor_node);
+                        // cout << "n loc" << n.loc << endl;
+                        // cout << "n g" << n.g << endl;
+                        // cout << "n h" << n.h << endl;
                     }
-                }
+                }   
             }
 
         }
@@ -523,14 +542,14 @@ int main(void) {
         //     }
         }
     
-    }
+    
 
         /*movein asdf = move_c(0, 110, 108);
         cout << asdf.motion << endl;
         cout << asdf.new_head << endl;*/
-        motors.cleanup();
-        tcrt.cleanup();
-        ir_sensors.cleanup();
+        //motors.cleanup();
+        //tcrt.cleanup();
+        //ir_sensors.cleanup();
         return 0;
     
 }
