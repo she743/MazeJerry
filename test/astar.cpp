@@ -337,6 +337,7 @@ int main(void) {
     closedlist.enqueue(&node);
     openlist.enqueue(&node);
     route.push(&s_node);
+    
 
     //show(&closedlist);
     int head = 1;
@@ -350,6 +351,7 @@ int main(void) {
         int ir_sensor_data;
 
         cout << current << endl;
+        cout << "neighbor empty? " << neighbor.is_empty() << endl;
         cout << "Enter sensor values (L, F, R):";
         cin.clear();
         cin >> ir_sensor_data;
@@ -365,9 +367,11 @@ int main(void) {
 
         if(ir_sensor_data == 111){
             // find minimum value in open list
+            cout << "ir_senosr_data is 111" << endl;
             Queue_Node* expect = openlist.dequeue();
             closedlist.enqueue(expect);
             Stack_Node* back;
+            
             cout << "expect : " << expect->loc << endl;
 
             while (route.top->parent != expect->parent) {
@@ -437,6 +441,7 @@ int main(void) {
                     Searching enable path.
                 */
                 int num = find_loc(head, s, current);
+                cout << "num : " << num << endl;
                 if (!closedlist.find(num)) {
                     if (cal_ob(s, ir_sensor_data) == 0) {
                         int cc = cal_ob(s, ir_sensor_data);
@@ -458,6 +463,7 @@ int main(void) {
                     }
                     neighbor.enqueue(&n);                
                 }
+            }
                 Queue_Node* neighbor_node = neighbor.dequeue();
                 closedlist.enqueue(neighbor_node);
                 information = move_c(head, current, neighbor_node->loc);
@@ -468,6 +474,7 @@ int main(void) {
                 cout << "move : " << motion_info << endl;
                 cout << "head : " <<head << endl;
                 cout << "----forward----" << endl;
+                cout << "here?" << endl;
                 //motion(motion_info, tcrt, motors);
                 s_node.loc = neighbor_node->loc;
                 s_node.parent = neighbor_node->parent;
@@ -476,12 +483,14 @@ int main(void) {
                 g++;
 
                 // compare 3 node and we have to find where we go
-                while(!neighbor.is_empty()){
+                while(neighbor.is_empty()){
                     neighbor_node = neighbor.dequeue();
-                    num = neighbor_node->loc;
-                    if (openlist.find(num)) {
+                    int loc_of_node = neighbor_node->loc;
+                    cout << "neighbor is not empty" << endl;
+                    if (openlist.find(loc_of_node)) {
                         Queue_Node* ptr;
-                        ptr = openlist.findptr(num);
+                        ptr = openlist.findptr(loc_of_node);
+                        cout << "----&&&&&----" <<endl;
                         if (ptr->f > neighbor_node->f) {
                             ptr->f = neighbor_node->f;
                             ptr->g = neighbor_node->g;
@@ -494,12 +503,13 @@ int main(void) {
                     }
                     else {
                         openlist.enqueue(neighbor_node);
+                        cout << "asdfghj" << endl;
                         // cout << "n loc" << n.loc << endl;
                         // cout << "n g" << n.g << endl;
                         // cout << "n h" << n.h << endl;
                     }
                 }   
-            }
+            
 
         }
         
