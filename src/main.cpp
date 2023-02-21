@@ -395,176 +395,256 @@ int main(void) {
     Motor motors(MOTOR_RIGHT_FORMARD, MOTOR_RIGHT_BACKMARD, MOTOR_LEFT_FORMARD, MOTOR_LEFT_BACKMARD);
     Sensor tcrt(TRCT_LEFT_PIN, TRCT_CENTER_PIN, TRCT_RIGHT_PIN);
     Sensor ir_sensors( IR_LEFT_PIN, IR_FOWRARD_PIN, IR_RIGHT_PIN );
+
+    // motion(0, tcrt, motors);
 	
-	motion(0, tcrt, motors); 
-    motion(1, tcrt, motors);
-    motion(1, tcrt, motors);
-    motion(3, tcrt, motors);
-	motion(0, tcrt, motors);
-    // motion(2, tcrt, motors);
-    // motion(2, tcrt, motors);
-    // motion(3, tcrt, motors);
-	
-    // P_Queue closedlist;
-    // P_Queue openlist;
-    // P_Stack route;
-    // Stack_Node s_node;
+	P_Queue closedlist;
+    P_Queue openlist;
+    P_Stack route;
+    Stack_Node s_node;
+    P_Queue neighbor;
 
-    // Queue_Node node;
-    // node.loc = START;
-    // node.parent = 0;
-    // node.ob = 0;
-    // node.g = 0;
-    // node.h = 0;
-    // node.f = 10000;
+    Queue_Node node;
+    node.loc = START;
+    node.parent = 0;
+    node.ob = 0;
+    node.g = 0;
+    node.h = 0;
+    node.f = 10000;
 
-    // s_node.loc = START;
-    // s_node.parent = 0;
+    s_node.loc = START;
+    s_node.parent = 0;
 
-    // int g = 0;
-    // int h = 0;
+    int g = 0;
+    int h = 0;
 
-    // closedlist.enqueue(&node);
-    // openlist.enqueue(&node);
-    // route.push(&s_node);
-
-    // //show(&closedlist);
-    // int head = 1;
-    // int current = START;
+    closedlist.enqueue(&node);
+    openlist.enqueue(&node);
+    route.push(&s_node);
     
-    // while (current != TARGET) {
+
+    //show(&closedlist);
+    int head = 1;
+    int current = START;
+    
+    movein information;
+    int motion_info;
+
+    while (current != TARGET) {
+
+        cout << current << endl;
+        /* 
+        cout << "neighbor empty? " << neighbor.is_empty() << endl;
+        cout << "Enter sensor values (L, F, R):";
+        cin.clear();
+        cin >> ir_sensor_data;
+        cout << ir_sensor_data << endl;
+        */
+
         
-    //     int abcde;
+        SensorDataFrame irdata = ir_sensors.get();
+        int ir_sensor_data = irdata.data;
 
-    //     cout << current << endl;
-    //     cout << "Enter sensor values (L, F, R):";
-    //     cin.clear();
-    //     cin >> abcde;
-    //     cout << abcde << endl;
+        cout << ir_sensor_data << endl;
         
-    //     int ir_sensor_data = abcde;
-
-    //     /*
-    //     SensorDataFrame irdata = ir_sensors.get();
-    //     int ir_sensor_data = irdata.data;
-
-    //     cout << ir_sensor_data << endl;
-    //     */
-
-    //     for (int s = 0; s < 3; s++) {
-    //         /*
-    //             Searching enable path.
-    //         */
-    //         int num = find_loc(head, s, current);
-    //         if (!closedlist.find(num)) {
-    //             if (cal_ob(s, ir_sensor_data) == 0) {
-    //                 int cc = cal_ob(s, ir_sensor_data);
-    //                 //cout << cc << endl;
-    //                 num = find_loc(head, s, num);
-    //             }
-    //             Queue_Node n;
-    //             n.loc = num;
-    //             n.parent = current;
-    //             n.ob = cal_ob(s, ir_sensor_data); 
-    //             n.g = g;
-    //             float num_1 = pow(TARGET / 100 - n.loc / 100, 2);
-    //             float num_2 = pow(TARGET % 100 - n.loc % 100, 2);
-    //             float num_3 = sqrt(num_1+num_2);
-    //             n.h = num_3;
-    //             n.f = n.g + n.h + n.ob;
-    //             if (n.loc == TARGET) {
-    //                 n.f = 0;
-    //             }
-
-    //             if (openlist.find(num)) {
-    //                 Queue_Node* ptr;
-    //                 ptr = openlist.findptr(num);
-    //                 if (ptr->f > n.f) {
-    //                     ptr->f = n.f;
-    //                     ptr->g = n.g;
-    //                     ptr->h = n.h;
-    //                     ptr->loc = n.loc;
-    //                     // ptr->next = n.next;
-    //                     ptr->ob = n.ob;
-    //                     ptr->parent = n.parent;
-    //                 }
-    //             }
-    //             else {
-    //                 openlist.enqueue(&n);
-    //                 cout << "n loc" << n.loc << endl;
-    //                 cout << "n g" << n.g << endl;
-    //                 cout << "n h" << n.h << endl;
-    //             }
-    //         }
-    //     }
-    //     //cout << ir_sensors.get().data << endl;
-        
-    //     Queue_Node* expect = openlist.dequeue();
-    //     closedlist.enqueue(expect);
-    //     movein information;
-    //     int motion_info;
-    //     Stack_Node* back;
-    //     if (expect->parent != current) {
-    //         cout << expect->parent << endl;
-    //         while (route.top->parent != expect->parent) {
-    //             back = route.pop();
-    //             information = move_c(head, current, back->parent);
-    //             motion_info = information.motion;
-    //             cout << "expect -> loc" <<expect->loc << endl;
 
 
-    //             if (expect->loc == TARGET) {
-    //                 cout << "if"  << endl;
-    //                 break;
-    //             }
+        if(ir_sensor_data == 111){
+            // find minimum value in open list
+            cout << "ir_senosr_data is 111" << endl;
+            Queue_Node* expect = openlist.dequeue();
+            closedlist.enqueue(expect);
+            Stack_Node* back;
+            
+            cout << "expect : " << expect->loc << endl;
 
-    //             head = information.new_head;
-    //             current = back->parent;
-    //             cout << "move : " << motion_info << endl;
-    //             cout << "head : " << head << endl;
-    //             cout << "loc : " << back->loc << endl;
-    //             cout << "parent : " << back->parent << endl;
+            while (route.top->parent != expect->parent) {
+                back = route.pop();
+                information = move_c(head, current, back->parent);
+                motion_info = information.motion;
+                cout << "expect -> loc" <<expect->loc << endl;
 
-    //             /////new one check!!
-    //             Queue_Node* return_node = closedlist.node_delete(back->loc);
-    //             openlist.enqueue(return_node);
 
-    //             //motion(motion_info, tcrt, motors);
-    //             g--;
-    //             //cout << "111111" << endl;
-    //         }
-    //         back = route.pop();
-    //         information = move_c(head, current, back->parent);
-    //         motion_info = information.motion;
-    //         head = information.new_head;
-    //         current = back->parent;
-    //         cout << "move : " << motion_info << endl;
-    //         cout << "head : " << head << endl;
-    //         cout << "----back----" << endl;
-    //         //motion(motion_info, tcrt, motors);
+                if (expect->loc == TARGET) {
+                    cout << "if"  << endl;
+                    break;
+                }
 
-    //         /////new one check!!
-    //             Queue_Node* return_node = closedlist.node_delete(back->loc);
-    //             openlist.enqueue(return_node);
+                head = information.new_head;
+                current = back->parent;
+                motion(motion_info, tcrt, motors);
+                cout << "move : " << motion_info << endl;
+                cout << "head : " << head << endl;
+                cout << "loc : " << back->loc << endl;
+                cout << "parent : " << back->parent << endl;
+
+                /////new one check!!
+                //Queue_Node* return_node = closedlist.node_delete(back->loc);
+                //openlist.enqueue(return_node);
+
+                //motion(motion_info, tcrt, motors);
+                g--;
+                //cout << "111111" << endl;
+            }
+
+            back = route.pop();
+            information = move_c(head, current, back->parent);
+            motion_info = information.motion;
+            head = information.new_head;
+            current = back->parent;
+            cout << "move : " << motion_info << endl;
+            motion(motion_info, tcrt, motors);
+            
+            cout << "head : " << head << endl;
+            cout << "----back----" << endl;
+            //motion(motion_info, tcrt, motors);
+
+            /////new one check!!
+                //Queue_Node* return_node = closedlist.node_delete(back->loc);
+                //openlist.enqueue(return_node);
                 
-    //         g--;
-    //     }
-    //     information = move_c(head, current, expect->loc);
-    //     motion_info = information.motion;
-    //     head = information.new_head;
-    //     current = expect->loc;
-    //     cout <<"current : " << current << endl;
-    //     cout << "move : " << motion_info << endl;
-    //     cout << "head : " <<head << endl;
-    //     cout << "----forward----" << endl;
-    //     //motion(motion_info, tcrt, motors);
-    //     s_node.loc = expect->loc;
-    //     s_node.parent = expect->parent;
-    //     route.push(&s_node);
+            g--;
 
-    //     g++;
+            information = move_c(head, current, expect->loc);
+            motion_info = information.motion;
+            head = information.new_head;
+            current = expect->loc;
+            cout << "move : " << motion_info << endl;
+            motion(motion_info, tcrt, motors);
+            cout <<"current : " << current << endl;
+            
+            cout << "head : " <<head << endl;
+            cout << "----forward----" << endl;
+            //motion(motion_info, tcrt, motors);
+            s_node.loc = expect->loc;
+            s_node.parent = expect->parent;
+            route.push(&s_node);
+
+            g++;
+
+        }
+        else{
+            // calculate node information and move   
+            for (int s = 0; s < 3; s++) {
+                /*
+                    Searching enable path.
+                */
+                int num = find_loc(head, s, current);
+                cout << "num : " << num << endl;
+                if (!closedlist.find(num)) {
+                    if (cal_ob(s, ir_sensor_data) == 0) {
+                        int cc = cal_ob(s, ir_sensor_data);
+                        //cout << cc << endl;
+                        num = find_loc(head, s, num);
+                    }
+                    Queue_Node n;
+                    n.loc = num;
+                    n.parent = current;
+                    n.ob = cal_ob(s, ir_sensor_data); 
+                    n.g = g;
+                    float num_1 = pow(TARGET / 100 - n.loc / 100, 2);
+                    float num_2 = pow(TARGET % 100 - n.loc % 100, 2);
+                    float num_3 = sqrt(num_1+num_2);
+                    n.h = num_3;
+                    n.f = n.g + n.h + n.ob;
+                    if (n.loc == TARGET) {
+                        n.f = 0;
+                    }
+                    neighbor.enqueue(&n);                
+                }
+            }
+                Queue_Node* neighbor_node = neighbor.dequeue();
+                closedlist.enqueue(neighbor_node);
+                information = move_c(head, current, neighbor_node->loc);
+                motion_info = information.motion;
+                head = information.new_head;
+                current = neighbor_node->loc;
+                cout << "move : " << motion_info << endl;
+                motion(motion_info, tcrt, motors);
+                cout <<"current : " << current << endl;
+                
+                cout << "head : " <<head << endl;
+                cout << "----forward----" << endl;
+                cout << "here?" << endl;
+                //motion(motion_info, tcrt, motors);
+                s_node.loc = neighbor_node->loc;
+                s_node.parent = neighbor_node->parent;
+                route.push(&s_node);
+
+                g++;
+
+                // compare 3 node and we have to find where we go
+                while(neighbor.is_empty()){
+                    neighbor_node = neighbor.dequeue();
+                    int loc_of_node = neighbor_node->loc;
+                    cout << "neighbor is not empty" << endl;
+                    if (openlist.find(loc_of_node)) {
+                        Queue_Node* ptr;
+                        ptr = openlist.findptr(loc_of_node);
+                        cout << "----&&&&&----" <<endl;
+                        if (ptr->f > neighbor_node->f) {
+                            ptr->f = neighbor_node->f;
+                            ptr->g = neighbor_node->g;
+                            ptr->h = neighbor_node->h;
+                            ptr->loc = neighbor_node->loc;
+                            // ptr->next = n.next;
+                            ptr->ob = neighbor_node->ob;
+                            ptr->parent = neighbor_node->parent;
+                        }
+                    }
+                    else {
+                        openlist.enqueue(neighbor_node);
+                        cout << "asdfghj" << endl;
+                        // cout << "n loc" << n.loc << endl;
+                        // cout << "n g" << n.g << endl;
+                        // cout << "n h" << n.h << endl;
+                    }
+                }   
+            
+
+        }
         
-    // }
+        //cout << ir_sensors.get().data << endl;
+        
+        
+        // if (expect->parent != current) {
+        //     cout << expect->parent << endl;
+
+        //     queue<int> q;
+        //     int parent_val = 0;
+        //     int location_to_find = current;
+
+        //     while(parent_val != expect->parent){
+        //         parent_val = closedlist.find_parent(location_to_find);
+        //         q.push(parent_val);
+        //         location_to_find = parent_val;
+        //         cout << "push" << endl;
+        //     }       
+
+        //     int loc_to_go=0;
+        //     while(!q.empty()){
+        //         //move
+        //         information = move_c(head, current, q.front());
+        //         motion_info = information.motion;
+        //         cout << "expect -> loc" <<expect->loc << endl;
+                
+        //         if (expect->loc == TARGET) {
+        //             cout << "if"  << endl;
+        //             break;
+        //         }
+
+        //         head = information.new_head;
+        //         current = q.front();
+        //         cout << "move : " << motion_info << endl;
+        //         cout << "head : " << head << endl;
+        //         cout << "loc : " << q.front() << endl;
+        //         q.pop();
+        //         cout << "pop" << endl;
+        //     }
+        
+        }
+    
+    
 
         /*movein asdf = move_c(0, 110, 108);
         cout << asdf.motion << endl;
