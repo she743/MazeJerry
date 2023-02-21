@@ -9,11 +9,13 @@ P_Queue::P_Queue() {
 }
 
 bool P_Queue::is_empty(void){
-    if(qNode = NULL){
-        return 1;
-    }
-    else {
+    Queue_Node* ptr;
+    ptr = qNode;
+    if (ptr == NULL) {
         return 0;
+    }
+    else{
+        return 1;
     }
 }
 
