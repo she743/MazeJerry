@@ -10,6 +10,8 @@ namespace MotorCTL{
             void turn_left( void );
             void calibL( void );
             void calibR( void );
+            void calibLL( void );
+            void calibRR( void );
         private:
             int r_forward_pin;
             int r_backward_pin;

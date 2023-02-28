@@ -6,9 +6,9 @@
 using namespace std;
 using namespace MotorCTL;
 
-int speed = 18;
-int callispeed = 15;
-int correct = 2; // 왼쪽으로 휠때는 -해주고 오른쪽으로 휠때는 +해준다
+int speed = 16;
+int callispeed = 20;
+int correct = -3; // 왼쪽으로 휠때는 -해주고 오른쪽으로 휠때는 +해준다
 
 Motor::Motor( int r_fpin, int r_bpin, int l_fpin, int l_bpin ) {
     wiringPiSetup();
@@ -75,17 +75,35 @@ void Motor::turn_right( void ) {
 void Motor::calibR( void ) {
     // Calibrate movement
     // cout << "Calibrating to R" << endl;
-    softPwmWrite(this->r_forward_pin, callispeed);
+    softPwmWrite(this->r_forward_pin, speed);
     softPwmWrite(this->r_backward_pin, 0);
-    softPwmWrite(this->l_forward_pin, speed);
+    softPwmWrite(this->l_forward_pin, callispeed);
     softPwmWrite(this->l_backward_pin, 0);  
 }
 
 void Motor::calibL( void ) {
     // Calibrate movement
     // cout << "Calibrating to L" << endl;
+    softPwmWrite(this->r_forward_pin, callispeed);
+    softPwmWrite(this->r_backward_pin, 0);
+    softPwmWrite(this->l_forward_pin, speed);
+    softPwmWrite(this->l_backward_pin, 0);  
+}
+
+void Motor::calibRR( void ) {
+    // Calibrate movement
+    // cout << "Calibrating to R" << endl;
+    softPwmWrite(this->r_forward_pin, speed-4);
+    softPwmWrite(this->r_backward_pin, 0);
+    softPwmWrite(this->l_forward_pin, speed);
+    softPwmWrite(this->l_backward_pin, 0);  
+}
+
+void Motor::calibLL( void ) {
+    // Calibrate movement
+    // cout << "Calibrating to L" << endl;
     softPwmWrite(this->r_forward_pin, speed);
     softPwmWrite(this->r_backward_pin, 0);
-    softPwmWrite(this->l_forward_pin, callispeed);
+    softPwmWrite(this->l_forward_pin, speed-4);
     softPwmWrite(this->l_backward_pin, 0);  
 }
