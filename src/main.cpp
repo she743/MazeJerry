@@ -12,9 +12,9 @@
 // !! change start and target location !!
 #define START 216
 #define TARGET 1202
-#define IR_LEFT_PIN 27
+#define IR_LEFT_PIN 28
 #define IR_FOWRARD_PIN 29
-#define IR_RIGHT_PIN 28
+#define IR_RIGHT_PIN 27
 #define TRCT_LEFT_PIN 6
 #define TRCT_CENTER_PIN 5
 #define TRCT_RIGHT_PIN 4
@@ -34,10 +34,11 @@ using namespace PQueue;
 using namespace Sensing;
 
 
-int counterL = 0; // Encoder counter
+int counterL = 0;
 int counterR = 0;
 int prev_A = 0; // Previous state of pin A
 int prev_C = 0;
+bool turncheck = 0;
 
 
 struct movein {
@@ -219,57 +220,57 @@ void interrupt_handler_right(void) {
     prev_C = curr_C;
 }
 
-int encoderLeft() {
-	wiringPiSetup();
+// int encoderLeft() {
+// 	wiringPiSetup();
 
-    softPwmCreate( PIN_A, 0, 100 );
-    softPwmCreate( PIN_B, 0, 100 );
+//     softPwmCreate( PIN_A, 0, 100 );
+//     softPwmCreate( PIN_B, 0, 100 );
         
-    wiringPiSetup();
+//     wiringPiSetup();
         
-    pinMode(PIN_A, INPUT);
-    pinMode(PIN_B, INPUT);
+//     pinMode(PIN_A, INPUT);
+//     pinMode(PIN_B, INPUT);
 
-    if (wiringPiSetup() == -1) {
-        return 1;
-    }
+//     if (wiringPiSetup() == -1) {
+//         return 1;
+//     }
 
-    wiringPiISR(PIN_A, INT_EDGE_BOTH, &interrupt_handler_left);
+//     wiringPiISR(PIN_A, INT_EDGE_BOTH, &interrupt_handler_left);
 
-    while (counterL<740) {
-        // cout << "Counter value: " << counterL << endl;
-		// delay(10);
-    }
-	counterL = 0;
-    prev_A = 0;
-	return 0;
-}
+//     while (counterL<740) {
+//         // cout << "Counter value: " << counterL << endl;
+// 		delay(10);
+//     }
+// 	counterL = 0;
+//     prev_A = 0;
+// 	return 0;
+// }
 
-int encoderRight() {
-	wiringPiSetup();
+// int encoderRight() {
+// 	wiringPiSetup();
 
-    softPwmCreate( PIN_C, 0, 100 );
-    softPwmCreate( PIN_D, 0, 100 );
+//     softPwmCreate( PIN_C, 0, 100 );
+//     softPwmCreate( PIN_D, 0, 100 );
         
-    wiringPiSetup();
+//     wiringPiSetup();
         
-    pinMode(PIN_C, INPUT);
-    pinMode(PIN_D, INPUT);
+//     pinMode(PIN_C, INPUT);
+//     pinMode(PIN_D, INPUT);
 
-    if (wiringPiSetup() == -1) {
-        return 1;
-    }
+//     if (wiringPiSetup() == -1) {
+//         return 1;
+//     }
 
-    wiringPiISR(PIN_C, INT_EDGE_BOTH, &interrupt_handler_right);
+//     wiringPiISR(PIN_C, INT_EDGE_BOTH, &interrupt_handler_right);
 
-    while (counterR<850) {
-        // cout << "Counter value: " << counterR << endl;
-		// delay(10);
-    }
-	counterR = 0;
-    prev_C = 0;
-	return 0;
-}
+//     while (counterR<750) {
+//         // cout << "Counter value: " << counterR << endl;
+// 		// delay(10);
+//     }
+// 	counterR = 0;
+//     prev_C = 0;
+// 	return 0;
+// }
 
 int encoder() {
 	wiringPiSetup();
@@ -279,23 +280,23 @@ int encoder() {
     softPwmCreate( PIN_C, 0, 100 );
     softPwmCreate( PIN_D, 0, 100 );
         
-    wiringPiSetup();
+    // wiringPiSetup();
 
     pinMode(PIN_A, INPUT);
     pinMode(PIN_B, INPUT);  
     pinMode(PIN_C, INPUT);
     pinMode(PIN_D, INPUT);
 
-    if (wiringPiSetup() == -1) {
-        return 1;
-    }
+    // if (wiringPiSetup() == -1) {
+    //     return 1;
+    // }
 
     wiringPiISR(PIN_A, INT_EDGE_BOTH, &interrupt_handler_left);
     wiringPiISR(PIN_C, INT_EDGE_BOTH, &interrupt_handler_right);
 
-    while (abs(counterR - counterL) < 1600) {
-        // cout << "Counter value: " << counterL << endl;
-		// delay(10);
+    while (abs(counterR - counterL) < 1480) {
+        cout << "Counter value: " << counterL << "   " << counterR << endl;
+		// delay(3);
     }
     counterL = 0;
 	counterR = 0;
@@ -309,23 +310,43 @@ void motion_forward( Sensor tcrt, Motor motors ){
     int tcrt_data_int = tcrt_data.data;
     motors.forward();
     delay(1000);
-    motors.stop();
+    // motors.stop();
 
     cout << "out" << endl;
-	delay(200);
+	// delay(200);
 	tcrt_data = tcrt.get();
     tcrt_data_int = tcrt_data.data;
     cout << tcrt_data_int << endl;
     while(tcrt_data_int != 000){
         if(tcrt_data_int == 101) motors.forward();
-        else if(tcrt_data_int == 011 || tcrt_data_int == 001) motors.calibL();
-        else if(tcrt_data_int == 110 || tcrt_data_int == 100) motors.calibR();
+        // else if(tcrt_data_int == 111){
+        //     if(turncheck == 0) motors.calibLL();
+        //     else if(turncheck == 1) motors.calibRR();
+        //     // tcrt_data = tcrt.get();
+        //     // tcrt_data_int = tcrt_data.data;
+        //     // if(tcrt_data_int == 110 || tcrt_data_int == 100 || tcrt_data_int == 000){
+        //     //     turncheck = 1;
+        //     // }
+        //     turncheck = 1 - turncheck;
+        // }
+        else if(tcrt_data_int == 011 || tcrt_data_int == 001){
+            motors.calibL();
+            // cout << "-------calibL-------" << endl;
+        }
+        else if(tcrt_data_int == 110 || tcrt_data_int == 100){
+            motors.calibR();
+            // cout << "-------calibR-------" << endl;
+        } 
 		else motors.forward();
 
 		tcrt_data = tcrt.get();
         tcrt_data_int = tcrt_data.data;
-        lineStatus(tcrt_data_int);
+        // lineStatus(tcrt_data_int);
     }
+    counterL = 0;
+    counterR = 0;
+    prev_A = 0;
+    prev_C = 0;
     motors.stop();
     delay(700);
     tcrt.cleanup();
@@ -334,6 +355,10 @@ void motion_forward( Sensor tcrt, Motor motors ){
 void motion_turn_right( Sensor tcrt, Motor motors ){
 	motors.turn_right();
 	encoder();
+    counterL = 0;
+    counterR = 0;
+    prev_A = 0;
+    prev_C = 0; 
 	motors.stop();
 	delay(700);
     tcrt.cleanup();
@@ -342,6 +367,10 @@ void motion_turn_right( Sensor tcrt, Motor motors ){
 void motion_turn_left( Sensor tcrt, Motor motors ){
 	motors.turn_left();
 	encoder();
+    counterL = 0;
+    counterR = 0;
+    prev_A = 0;
+    prev_C = 0;
 	motors.stop();
 	delay(700);
     tcrt.cleanup();
@@ -424,7 +453,7 @@ int main(void) {
     
 
     //show(&closedlist);
-    int head = 1;
+    int head = 1; 
     int current = START;
     
     movein information;
